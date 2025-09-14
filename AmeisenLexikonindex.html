@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Kinderlexikon: Heimische Ameisen in Deutschland</title>
+  <style>
+    :root{
+      --bg:#fffdf7; --ink:#233043; --muted:#5b6b7a;
+      --brand:#ffb703; --brand-2:#29b6f6; --brand-3:#43a047;
+      --card:#ffffff; --ring:#ffd773; --shadow:0 12px 30px rgba(0,0,0,.08);
+      --radius:20px;
+    }
+    *{box-sizing:border-box}
+    html,body{margin:0;background:var(--bg);color:var(--ink);
+      font-family:"Nunito", system-ui, Segoe UI, Roboto, Arial, sans-serif}
+    header.hero{
+      background: radial-gradient(1200px 300px at 50% -120px, var(--brand) 0%, #ffd773 45%, #ffe9b7 70%, #fffdf7 100%);
+      padding:36px 16px 18px; position:sticky; top:0; z-index:5;
+      box-shadow:0 2px 8px rgba(0,0,0,.06); border-bottom:3px solid var(--ring);
+    }
+    .hero-inner{max-width:1100px;margin:0 auto;display:flex;gap:16px;align-items:center;justify-content:space-between}
+    .logo{display:flex;align-items:center;gap:12px;font-weight:900;font-size:clamp(22px,4vw,34px)}
+    .logo .bubble{width:46px;height:46px;border-radius:50%;background:#fff;display:grid;place-items:center;box-shadow:var(--shadow)}
+    .logo small{display:block;font-size:12px;font-weight:800;color:#7a5a00;letter-spacing:.3px}
+    nav a{display:inline-block;margin:0 8px;padding:8px 12px;border-radius:999px;background:#fff;text-decoration:none;color:#3a3a3a;font-weight:900;box-shadow:0 4px 12px rgba(0,0,0,.06)}
+    nav a.active{background:var(--brand-2);color:#fff}
+    .wrap{max-width:1100px;margin:18px auto 60px;padding:0 16px}
+    .crumbs{font-size:14px;margin:8px 0 10px}
+    .crumbs a{text-decoration:none;color:#1d4ed8}
+    .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:18px}
+    .card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:18px}
+    .card h3{margin:0 0 6px}
+    .tag{display:inline-block;background:#fff4d9;color:#7a5a00;border:2px solid var(--ring);border-radius:999px;font-weight:800;font-size:12px;padding:5px 10px;margin:0 6px 8px 0}
+    .btn{appearance:none;border:none;background:var(--brand-3);color:#fff;padding:10px 14px;border-radius:14px;font-weight:900;cursor:pointer;box-shadow:0 8px 18px rgba(67,160,71,.25)}
+    .btn:active{transform:translateY(1px)}
+    .species-card{display:flex;gap:14px}
+    .species-card img{width:120px;height:120px;object-fit:cover;border-radius:14px;border:4px solid #e8f4ff}
+    .notice{background:#fff;border:2px dashed var(--ring);border-radius:16px;padding:12px 14px;font-weight:800}
+    .sheet{background:#fff;border-radius:18px;box-shadow:var(--shadow);padding:18px}
+    .sheet h2{margin-top:0}
+    .facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin-top:10px}
+    .fact{background:#f7fbff;border:1px dashed #cfe6ff;border-radius:12px;padding:10px}
+    .sec{margin:16px 0}
+    footer{margin:40px 0 20px;text-align:center;color:var(--muted);font-size:14px}
+    @media print{header.hero,nav,.crumbs,.btn{display:none} body{background:#fff}}
+  </style>
+</head>
+<body>
+  <header class="hero">
+    <div class="hero-inner">
+      <div class="logo"><span class="bubble">🐜</span> Ameisen <small>Kinderlexikon</small></div>
+      <nav>
+        <a href="#/" id="nav-home" class="active">Start</a>
+        <a href="#/arten" id="nav-arten">Arten</a>
+        <a href="#/woerterbuch" id="nav-woerterbuch">Wörterbuch</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <div id="view"></div>
+  </main>
+
+  <footer>© Kinderlexikon Ameisen • Kindgerechte Sprache • Inhalte nach Kinder- &amp; Wissenschaftsseiten aufbereitet (NABU, BfN Schule &amp; Natur, LBV)</footer>
+
+  <script>
+    /* -------------------------------------------
+       DATEN: Vier heimische Arten
+       Steckbrief = Stichpunkte, alle anderen Abschnitte = Fließtext
+       ------------------------------------------- */
+    const SPECIES = [
+      {
+        id:'formica-rufa', name:'Rote Waldameise', latin:'Formica rufa',
+        img:'https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/Formica_rufa_LC0294.jpg/480px-Formica_rufa_LC0294.jpg',
+        brief:{
+          groesse:'Arbeiterin 4,5–9 mm; Königin deutlich größer',
+          geschwindigkeit:'3–5 cm pro Sekunde auf freien Wegen',
+          gewicht:'einige Milligramm je Arbeiterin',
+          lebensdauer:'Arbeiterinnen 1–3 Jahre; Königin bis über 10 Jahre',
+          nahrung:'Honigtau, Insektenbeute, Aas',
+          feinde:'Spechte, Kröten, Spinnen, Parasiten, andere Ameisen',
+          verbreitung:'weite Teile Deutschlands, v. a. in Nadel- und Mischwäldern',
+          lebensraum:'lichte Wälder, Waldränder, sonnige Schneisen'
+        },
+        merkmale:'Die Waldameise erkennt man an ihrem <strong>rotbraunen Kopf</strong> und der <strong>dunklen Hinterleibsspitze</strong>. Sie baut große <strong>Hügelnester</strong>, die warm bleiben und viele Kammern besitzen. Bei Gefahr verspritzt sie <strong>Ameisensäure</strong>, um Feinde zu vertreiben. Die Tiere arbeiten eng <strong>zusammen</strong> und bilden lange <strong>Ameisenstraßen</strong>, die zu Futterstellen führen.',
+        lebensraum:'Die Art mag <strong>sonnige Waldränder</strong>, Lichtungen und Wege mit lockerem <strong>Boden</strong>. Dort findet sie <strong>Baumaterial</strong> wie Nadeln und Zweige sowie viele <strong>Insekten</strong>. Ein Hügel steht am liebsten so, dass die Sonne die <strong>Brut</strong> wärmt.',
+        lebensweise:'Die Waldameise lebt in großen <strong>Staaten</strong> mit einer <strong>Königin</strong> und vielen Arbeiterinnen. Im <strong>Frühjahr</strong> wird das Nest repariert und die Brut gewärmt, im <strong>Sommer</strong> sammeln viele Tiere Nahrung in Teams. Wenn es <strong>kalt</strong> wird, ruht das Volk tief im Bau. Die gute <strong>Organisation</strong> macht die Kolonie stark.',
+        roles:[
+          {title:'Königin', sentence:'Sie bleibt tief im <strong>Hügel</strong> und legt die <strong>Eier</strong>, damit immer neue Ameisen entstehen.'},
+          {title:'Brutpflegerinnen', sentence:'Sie füttern die <strong>Larven</strong>, putzen sie und halten sie <strong>warm</strong>.'},
+          {title:'Baumeisterinnen', sentence:'Sie erweitern den <strong>Hügel</strong>, reparieren <strong>Gänge</strong> und sorgen für frische Luft.'},
+          {title:'Sammlerinnen', sentence:'Sie holen <strong>Honigtau</strong>, kleine <strong>Insekten</strong> und andere Nahrung und tragen alles ins Nest.'},
+          {title:'Wächterinnen / Soldaten', sentence:'Sie bewachen die <strong>Eingänge</strong> und sprühen bei Gefahr <strong>Ameisensäure</strong>.'},
+          {title:'Melkerinnen', sentence:'Sie pflegen <strong>Blattläuse</strong> und sammeln ihren süßen <strong>Honigtau</strong>.'}
+        ],
+        koerperbau:'Der Körper besteht aus <strong>Kopf</strong>, <strong>Brust</strong> und <strong>Hinterleib</strong>. Auf dem Kopf sitzen <strong>Fühler</strong> und kräftige <strong>Kiefer</strong>; an der Brust befinden sich sechs schnelle <strong>Beine</strong>. Im Hinterleib liegt die Drüse für die <strong>Ameisensäure</strong>.',
+        ernaehrung:'Die Art sammelt süßen <strong>Honigtau</strong> an Bäumen und Sträuchern und jagt kleine <strong>Insekten</strong>. Sie braucht <strong>Wasser</strong> und sichere Wege zum Futter. Durch gemeinsame <strong>Sammelstraßen</strong> kommt viel Nahrung im Nest an.',
+        verhalten:'Im <strong>Frühjahr</strong> wird die Brut gewärmt, im <strong>Sommer</strong> viel gesammelt, und bei Gefahr wird das Nest mit <strong>Säure</strong> verteidigt. Gegenüber anderen Tieren ist sie wachsam und folgt klaren <strong>Duftspuren</strong>.',
+        garten:'Ein naturnaher Garten mit <strong>Totholz</strong>, Laub und <strong>heimischen Sträuchern</strong> hilft. Auf <strong>Pestizide</strong> sollte verzichtet werden, und sonnige Ruheplätze sind wichtig.',
+        lebenserwartung:'Arbeiterinnen leben meist <strong>1–3 Jahre</strong>, die <strong>Königin</strong> kann deutlich länger leben. Geschützte Hügel überdauern oft viele Jahre.',
+        feinde_bedroh:'Feinde sind <strong>Vögel</strong>, <strong>Amphibien</strong>, <strong>Spinnen</strong> und andere Ameisen; Bedrohungen sind <strong>Nestzerstörung</strong> und <strong>Lebensraumverlust</strong>.',
+        oekosystem:'Sie lockert den <strong>Boden</strong>, frisst <strong>Schädlinge</strong> und verteilt <strong>Samen</strong> – eine wichtige Helferin im Wald.',
+        fortpflanzung:'An warmen Tagen fliegen junge <strong>Königinnen</strong> und Männchen zum <strong>Hochzeitsflug</strong> aus. Danach gründet die Königin ein neues Nest und zieht die erste Brut alleine groß.'
+      },
+      {
+        id:'solenopsis-fugax', name:'Gelbe Diebsameise', latin:'Solenopsis fugax',
+        img:'https://upload.wikimedia.org/wikipedia/commons/thumb/2/25/Solenopsis_fugax_worker.jpg/480px-Solenopsis_fugax_worker.jpg',
+        brief:{
+          groesse:'1,5–3 mm – sehr klein',
+          geschwindigkeit:'flink, oft unterirdisch unterwegs',
+          gewicht:'Bruchteile eines Milligramms',
+          lebensdauer:'Arbeiterinnen bis 1 Jahr; Königinnen mehrere Jahre',
+          nahrung:'Honigtau und kleine Tierreste, oft aus Nachbar-Nestern',
+          feinde:'größere Ameisen, Laufkäfer, Spinnen',
+          verbreitung:'in warmen Regionen Deutschlands',
+          lebensraum:'trockene, sandige Standorte; Wege, Trockenrasen'
+        },
+        merkmale:'Die Art ist <strong>bernstein-gelb</strong> und <strong>winzig</strong>. Sie kriecht durch sehr schmale <strong>Spalten</strong> und holt Nahrung aus anderen Nestern. Ihr heimliches Verhalten hilft ihr, Feinde zu vermeiden.',
+        lebensraum:'Sonnige, <strong>trockene</strong> Stellen mit lockerer <strong>Erde</strong> sind ideal. Ihre Gänge führen oft zu Nachbarstaaten, wo sie verdeckt <strong>Nahrung</strong> stibitzt.',
+        lebensweise:'Kleine Völker leben <strong>unauffällig</strong> und meiden Kämpfe. Die winzigen Eingänge sind von außen kaum zu sehen, und viele Wege verlaufen <strong>unterirdisch</strong>.',
+        roles:[
+          {title:'Königin', sentence:'Sie bleibt in einer geschützten <strong>Kammer</strong> und legt winzige <strong>Eier</strong> für die Kolonie.'},
+          {title:'Brutpflegerinnen', sentence:'Sie betreuen die sehr kleinen <strong>Larven</strong> und halten das Nest <strong>sauber</strong>.'},
+          {title:'Baumeisterinnen', sentence:'Sie graben schmale <strong>Tunnel</strong> und versteckte Kammern in weichen Boden.'},
+          {title:'Sammlerinnen', sentence:'Sie suchen <strong>Honigtau</strong> und kleine <strong>Reste</strong> und bringen sie heim.'},
+          {title:'Späherinnen', sentence:'Sie schleichen in andere Nester und holen dort <strong>Nahrung</strong> für den Staat.'},
+          {title:'Wächterinnen', sentence:'Sie tarnen die <strong>Eingänge</strong> und verhindern, dass große Feinde eindringen.'}
+        ],
+        koerperbau:'Ihr Körper ist sehr fein gebaut: ein kleiner <strong>Kopf</strong> mit zarten <strong>Fühlern</strong>, eine kurze <strong>Brust</strong> und ein runder <strong>Hinterleib</strong>. Die gelbe Farbe tarnt sie im Sand.',
+        ernaehrung:'Sie sammelt süßen <strong>Honigtau</strong> an bodennahen Pflanzen und holt <strong>Tierreste</strong> aus anderen Nestern. Wärme und trockene Böden sind für die Nahrungssuche wichtig.',
+        verhalten:'Sie ist <strong>scheu</strong> und flieht in <strong>Spalten</strong>. In warmen Monaten ist sie aktiv, im Winter ruht das Volk tief im Boden.',
+        garten:'Warme, <strong>sandige</strong> Ecken mit Steinen und etwas Reisig helfen. Bitte keine <strong>Gifte</strong> einsetzen, damit die kleinen Staaten nicht gefährdet werden.',
+        lebenserwartung:'Arbeiterinnen leben etwa <strong>1 Jahr</strong>, <strong>Königinnen</strong> oft deutlich länger. Schutz und Ruhe erhöhen die Chancen der Kolonie.',
+        feinde_bedroh:'Größere <strong>Ameisen</strong>, <strong>Bodenverdichtung</strong> und Verlust von offenen Flächen können der Art stark schaden.',
+        oekosystem:'Sie räumt kleinste <strong>Reste</strong> auf und ist Nahrung für viele <strong>Bodentiere</strong>. Damit gehört sie zum feinen Gleichgewicht im Boden.',
+        fortpflanzung:'An warmen Tagen gibt es kleine Schwarmflüge. Danach gründen winzige <strong>Jungköniginnen</strong> neue Mini-Völker im Boden.'
+      },
+      {
+        id:'tetramorium-caespitum', name:'Rasenameise', latin:'Tetramorium cf. caespitum',
+        img:'https://upload.wikimedia.org/wikipedia/commons/thumb/9/9a/Tetramorium_caespitum_ant.jpg/480px-Tetramorium_caespitum_ant.jpg',
+        brief:{
+          groesse:'2,5–4 mm',
+          geschwindigkeit:'schnell, bildet Straßen',
+          gewicht:'wenige Milligramm',
+          lebensdauer:'Arbeiterinnen 1–2 Jahre; Königinnen länger',
+          nahrung:'Honigtau, Samen, kleine Insekten',
+          feinde:'Vögel, Spinnen, andere Ameisen',
+          verbreitung:'weit verbreitet in Siedlungen',
+          lebensraum:'Rasen, Pflasterfugen, Parkwege'
+        },
+        merkmale:'Die Rasenameise ist <strong>dunkelbraun</strong> und zeigt eine feine <strong>Riefelung</strong> am Kopf. Im Rasen erkennt man sie an kleinen <strong>Kraterhügeln</strong> und vielen Eingängen.',
+        lebensraum:'Sie bewohnt trockene, <strong>offene</strong> Flächen in Gärten und Parks und nutzt gern <strong>Fugen</strong> und lockere Erde. Sonnige Stellen erleichtern die Nahrungssuche.',
+        lebensweise:'Sie ist sehr <strong>anpassungsfähig</strong> und sammelt in Gruppen. Mehrere Nester können <strong>zusammenarbeiten</strong>, was die Kolonie erfolgreicher macht.',
+        roles:[
+          {title:'Königin', sentence:'Sie legt regelmäßig <strong>Eier</strong> und sorgt dafür, dass die Kolonie <strong>wächst</strong>.'},
+          {title:'Brutpflegerinnen', sentence:'Sie schützen die <strong>Jungen</strong> vor Kälte und füttern sie zuverlässig.'},
+          {title:'Baumeisterinnen', sentence:'Sie schaffen neue <strong>Kammern</strong> und halten die <strong>Eingänge</strong> frei.'},
+          {title:'Sammlerinnen', sentence:'Sie tragen <strong>Honigtau</strong>, kleine <strong>Insekten</strong> und <strong>Samen</strong> ins Nest.'},
+          {title:'Wächterinnen', sentence:'Sie bewachen die <strong>Eingänge</strong> und schrecken neugierige Tiere ab.'},
+          {title:'Vorratssammlerinnen', sentence:'Sie lagern trockene <strong>Samen</strong> für Zeiten mit wenig Nahrung ein.'}
+        ],
+        koerperbau:'Sie ist klein und kompakt mit kräftigen <strong>Kiefern</strong> und sechs schnellen <strong>Beinen</strong>. Die gegliederte Form hilft beim Bewegen in engen Fugen.',
+        ernaehrung:'Sie mag <strong>Honigtau</strong> und <strong>Samen</strong> und sammelt Krümel sowie kleine <strong>Insekten</strong> an Wegen. Trockene, warme Bereiche bieten viele Futterquellen.',
+        verhalten:'Im <strong>Frühjahr</strong> wird gebaut, im <strong>Sommer</strong> intensiv gesammelt; bei Störung verteidigt sie sich tapfer, ohne große Schäden zu verursachen.',
+        garten:'<strong>Blühflächen</strong>, etwas <strong>Totholz</strong> und ungespritzte Bereiche helfen; nicht ständig wässern und mähen, damit offene Stellen bleiben.',
+        lebenserwartung:'Arbeiterinnen leben meist <strong>1–2 Jahre</strong>; Königinnen werden deutlich älter. Ruhe am Nestplatz ist wichtig.',
+        feinde_bedroh:'<strong>Bodenversiegelung</strong>, intensive Pflege und <strong>Pestizide</strong> schaden der Art und ihren Nistplätzen.',
+        oekosystem:'Sie verteilt <strong>Samen</strong>, lockert den <strong>Boden</strong> und hilft bei der Kontrolle kleiner <strong>Schädlinge</strong> im Garten.',
+        fortpflanzung:'An warmen Tagen schwärmen Männchen und <strong>Königinnen</strong> aus; neue Nester entstehen oft in <strong>Fugen</strong> oder lockerer Erde.'
+      },
+      {
+        id:'formica-sanguinea', name:'Rote Raubameise', latin:'Formica sanguinea',
+        img:'https://upload.wikimedia.org/wikipedia/commons/thumb/2/2a/Formica_sanguinea.jpg/480px-Formica_sanguinea.jpg',
+        brief:{
+          groesse:'6–9 mm',
+          geschwindigkeit:'zügig, ausdauernd',
+          gewicht:'wenige Milligramm',
+          lebensdauer:'Arbeiterinnen bis 2 Jahre; Königin länger',
+          nahrung:'Insekten, Honigtau',
+          feinde:'Vögel, größere Ameisen, Parasiten',
+          verbreitung:'regional in Deutschland',
+          lebensraum:'sonnige Wald- und Heideflächen'
+        },
+        merkmale:'Die Art ist <strong>rot-schwarz</strong> gefärbt und kann andere Nester <strong>überfallen</strong>, um dort <strong>Brut</strong> zu holen. Ihre Wehrhaftigkeit macht sie zu einer starken Nachbarin.',
+        lebensraum:'Sie lebt an warmen <strong>Waldrändern</strong> mit lockerem Boden und Hecken, wo viele <strong>Insekten</strong> vorkommen.',
+        lebensweise:'Sie ist <strong>mutig</strong> und <strong>räuberisch</strong> und bildet klare Straßen zu Beutequellen; im <strong>Winter</strong> ruht das Volk im geschützten Nest.',
+        roles:[
+          {title:'Königin', sentence:'Sie bleibt im sicheren <strong>Nest</strong> und legt viele <strong>Eier</strong>, damit der Staat stark bleibt.'},
+          {title:'Brutpflegerinnen', sentence:'Sie füttern und bewachen die <strong>Brut</strong>, bis neue Arbeiterinnen schlüpfen.'},
+          {title:'Baumeisterinnen', sentence:'Sie graben <strong>Gänge</strong> in warmem Sand oder lockerer Erde.'},
+          {title:'Jägerinnen', sentence:'Sie fangen <strong>Insekten</strong> und tragen die Beute in den Bau.'},
+          {title:'Wächterinnen / Soldaten', sentence:'Sie verteidigen das Nest entschlossen gegen <strong>Eindringlinge</strong>.'},
+          {title:'Beuteholerinnen', sentence:'Sie durchsuchen fremde Nester nach <strong>Larven</strong> und tragen sie heim, um sie als Helferinnen großzuziehen.'}
+        ],
+        koerperbau:'Ihr Körper ist kräftig gebaut mit deutlichen <strong>Kiefern</strong> und klar getrennten <strong>Körperabschnitten</strong>. Die Färbung hilft bei Tarnung und Warnung.',
+        ernaehrung:'Sie jagt <strong>Insekten</strong> und sammelt <strong>Honigtau</strong>. Sonnige Plätze und Hecken mit Läusen bieten viele Futterquellen.',
+        verhalten:'Sie ist sehr <strong>wehrhaft</strong> und organisiert; im Sommer ist viel Bewegung im Gelände, im Winter herrscht <strong>Ruhe</strong> im Nest.',
+        garten:'<strong>Sonnige</strong>, naturnahe Ecken mit <strong>Reisig</strong> und <strong>Totholz</strong> helfen der Art. Störungen am Nest sollten vermieden werden.',
+        lebenserwartung:'Arbeiterinnen werden bis etwa <strong>2 Jahre</strong> alt; Königinnen leben oft deutlich länger.',
+        feinde_bedroh:'<strong>Habitatverlust</strong>, Neststörungen und <strong>Pestizide</strong> gefährden die Kolonie am meisten.',
+        oekosystem:'Sie reguliert <strong>Insektenbestände</strong> und trägt wichtige <strong>Nährstoffe</strong> im Boden um. So bleibt das Gleichgewicht erhalten.',
+        fortpflanzung:'Im <strong>Sommer</strong> schwärmen Männchen und Königinnen aus; nach der Paarung entstehen neue Kolonien an geschützten Orten.'
+      }
+    ];
+
+    /* -------------------------------------------
+       VIEWS
+       ------------------------------------------- */
+    const view = document.getElementById('view');
+
+    function speciesCardHTML(s){
+      return `<article class="card species-card">
+        <img src="${s.img}" alt="${s.name}" />
+        <div>
+          <h3>${s.name} <small style="display:block;color:#6b7280;font-weight:700"><em>${s.latin}</em></small></h3>
+          <p style="margin:.3rem 0 .6rem">${s.merkmale}</p>
+          <a class="btn" href="#/art/${s.id}">Steckbrief</a>
+        </div>
+      </article>`;
+    }
+
+    function homeView(){
+      view.innerHTML = `
+        <div class="crumbs">🏠 Startseite</div>
+        <div class="grid">
+          <article class="card">
+            <span class="tag">Allgemeines</span>
+            <h3>Was sind Ameisen?</h3>
+            <p>Ameisen sind <strong>Insekten</strong>, die in großen <strong>Staaten</strong> zusammenleben. Es gibt eine <strong>Königin</strong>, viele <strong>Arbeiterinnen</strong> und im Sommer <strong>Männchen</strong>. Ameisen <strong>sprechen</strong> mit Duftstoffen und bilden <strong>Ameisenstraßen</strong>, um sicher Futter zu finden.</p>
+            <div class="notice">In Deutschland leben über <strong>100 Ameisenarten</strong>.</div>
+          </article>
+          <article class="card">
+            <span class="tag">Lebensräume</span>
+            <h3>Wo leben Ameisen?</h3>
+            <p>Sie wohnen in <strong>Wäldern</strong>, <strong>Wiesen</strong>, <strong>Gärten</strong> und sogar in Städten. Nester liegen im <strong>Boden</strong>, unter <strong>Steinen</strong> oder im <strong>Holz</strong>.</p>
+          </article>
+          <article class="card">
+            <span class="tag">Nahrung</span>
+            <h3>Was fressen Ameisen?</h3>
+            <p>Viele Arten mögen <strong>Honigtau</strong>, außerdem kleine <strong>Insekten</strong> und Reste. Sie brauchen <strong>Wasser</strong> und sichere Wege zum Futter.</p>
+          </article>
+        </div>
+
+        <!-- Der frühere Block „Beschriftung des Ameisenkörpers“ wurde entfernt -->
+
+        <h2 style="margin:24px 0 10px">🐜 Heimische Arten</h2>
+        <div class="grid">${SPECIES.map(s => speciesCardHTML(s)).join('')}</div>
+        <p style="margin-top:14px"><a href="#/arten" class="btn">Alle Arten als Liste</a></p>
+      `;
+    }
+
+    function listView(){
+      view.innerHTML = `
+        <div class="crumbs">🏠 <a href="#/">Start</a> › Arten</div>
+        <h2>Alle heimischen Arten (Auswahl)</h2>
+        <div class="grid">${SPECIES.map(s => speciesCardHTML(s)).join('')}</div>
+      `;
+    }
+
+    function sheetView(id){
+      const s = SPECIES.find(x=>x.id===id);
+      if(!s){ location.hash = '#/arten'; return; }
+      view.innerHTML = `
+        <div class="crumbs">🏠 <a href="#/">Start</a> › <a href="#/arten">Arten</a> › ${s.name}</div>
+        <div class="sheet">
+          <div style="display:flex;gap:18px;flex-wrap:wrap;align-items:flex-start">
+            <img src="${s.img}" alt="${s.name}" style="width:260px;height:200px;object-fit:cover;border-radius:16px;border:4px solid #e8f4ff"/>
+            <div>
+              <h2>${s.name}</h2>
+              <p style="margin:.2rem 0 0;color:#6b7280"><em>${s.latin}</em></p>
+              <button class="btn" onclick="window.print()">🖨️ Steckbrief drucken</button>
+            </div>
+          </div>
+
+          <h3 class="sec">1) Steckbrief</h3>
+          <div class="facts">
+            <div class="fact"><strong>Größe:</strong> ${s.brief.groesse}</div>
+            <div class="fact"><strong>Geschwindigkeit:</strong> ${s.brief.geschwindigkeit}</div>
+            <div class="fact"><strong>Gewicht:</strong> ${s.brief.gewicht}</div>
+            <div class="fact"><strong>Lebensdauer:</strong> ${s.brief.lebensdauer}</div>
+            <div class="fact"><strong>Nahrung:</strong> ${s.brief.nahrung}</div>
+            <div class="fact"><strong>Feinde:</strong> ${s.brief.feinde}</div>
+            <div class="fact"><strong>Verbreitung:</strong> ${s.brief.verbreitung}</div>
+            <div class="fact"><strong>Lebensraum:</strong> ${s.brief.lebensraum}</div>
+          </div>
+
+          <h3 class="sec">2) Merkmale und Besonderheiten</h3>
+          <p>${s.merkmale}</p>
+
+          <h3 class="sec">3) Lebensraum</h3>
+          <p>${s.lebensraum}</p>
+
+          <h3 class="sec">4) Lebensweise</h3>
+          <p>${s.lebensweise}</p>
+
+          <h3 class="sec">Aufgaben im Ameisenstaat</h3>
+          <ul>
+            ${s.roles.map(r=>`<li><strong>${r.title}</strong> – ${r.sentence}</li>`).join('')}
+          </ul>
+
+          <h3 class="sec">5) Körperbau und Aussehen</h3>
+          <p>${s.koerperbau}</p>
+
+          <h3 class="sec">6) Ernährung</h3>
+          <p>${s.ernaehrung}</p>
+
+          <h3 class="sec">7) Verhalten</h3>
+          <p>${s.verhalten}</p>
+
+          <h3 class="sec">8) Wie kann man Ameisen in den Garten locken? Was brauchen sie zum Leben?</h3>
+          <p>${s.garten}</p>
+
+          <h3 class="sec">9) Lebenserwartung</h3>
+          <p>${s.lebenserwartung}</p>
+
+          <h3 class="sec">10) Feinde und Bedrohungen</h3>
+          <p>${s.feinde_bedroh}</p>
+
+          <h3 class="sec">11) Bedeutung für das Ökosystem</h3>
+          <p>${s.oekosystem}</p>
+
+          <h3 class="sec">12) Fortpflanzung</h3>
+          <p>${s.fortpflanzung}</p>
+        </div>
+      `;
+    }
+
+    function dictView(){
+      const entries = [
+        {t:'Honigtau', d:'Süße Tropfen von Blattläusen. Ameisen trinken sie gern.'},
+        {t:'Hochzeitsflug', d:'Flug von Männchen und Jungköniginnen. Danach gründen Königinnen neue Nester.'},
+        {t:'Staat', d:'Die große Ameisenfamilie. Alle helfen zusammen.'}
+      ];
+      view.innerHTML = `
+        <div class="crumbs">🏠 <a href="#/">Start</a> › Wörterbuch</div>
+        <div class="grid">
+          ${entries.map(e=>`<article class="card"><h3>${e.t}</h3><p>${e.d}</p></article>`).join('')}
+        </div>
+      `;
+    }
+
+    /* -------------------------------------------
+       Router + Navigation
+       ------------------------------------------- */
+    function setActive(tab){
+      document.querySelectorAll('nav a').forEach(a=>a.classList.remove('active'));
+      const el=document.getElementById('nav-'+tab); if(el) el.classList.add('active');
+    }
+    function router(){
+      const hash = location.hash.replace('#','');
+      if(hash.startsWith('/art/')){ setActive('arten'); sheetView(hash.split('/')[2]); return; }
+      if(hash === '/arten'){ setActive('arten'); listView(); return; }
+      if(hash === '/woerterbuch'){ setActive('woerterbuch'); dictView(); return; }
+      setActive('home'); homeView();
+    }
+    addEventListener('hashchange', router);
+    router();
+  </script>
+</body>
+</html>
